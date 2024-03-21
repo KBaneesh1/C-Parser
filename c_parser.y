@@ -106,9 +106,12 @@ F : '('Expression')'
   ;
           
 
-if_loop: IF '(' condition ')' '{'stmt'}' else_part
+if_loop: IF '(' condition ')' next_part_if
        ;
 
+next_part_if : '{'stmt'}' else_part
+        | stmt
+        ;
 else_part : ELSE '{'stmt'}'
           | ELSE if_loop
           | /* Empty */
@@ -119,7 +122,11 @@ condition: Expression
         ;
 
 
-while_loop : WHILE '('Expression ')' '{'stmt'}'
+while_loop : WHILE '('Expression ')' next_while_part 
+        ;
+
+next_while_part : '{'stmt'}'
+        | stmt
         ;
 // loop_stmt :  '{'stmt'}'
 // //            | Assign ';'
