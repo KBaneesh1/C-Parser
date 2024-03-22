@@ -1,9 +1,9 @@
 %{
-    //C dec1
-    #include<stdio.h>
     #include "y.tab.h"
-    int yylineno;
+    int countn=1;
 %}
+
+%option yylineno
 digit [0-9]+
 opFraction "."{digit} 
 opExponent [eE][+-]?{digit}
@@ -22,10 +22,10 @@ else return ELSE;
 while return WHILE;
 for return FOR;
 do return DO;
-swtich return SWITCH;
+switch return SWITCH;
 case return CASE;
-break return BREAK;
 default return DEFAULT;
+break return BREAK;
 
 
 [a-zA-Z_][a-zA-Z0-9_]* return ID;
@@ -38,7 +38,7 @@ default return DEFAULT;
 "#include"[ ]<[a-zA-Z_][A-Za-z0-9_]*\.h> return HEADER;
 "//".*    ;
 [ \t]+   ;
-\n   ;    { ++yylineno; }
+[\n]                        { countn++; }
 '.'  return CHARACTER;
 "/*"[^*]*(\*[^/]*)*"*/"  ;
 .  {return *yytext;}

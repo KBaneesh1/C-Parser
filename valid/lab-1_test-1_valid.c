@@ -35,6 +35,12 @@ int main()
 			}
 		}
 	}
+	// a++;
+	int i=0;
+	// for(i++;<10;i++);
+	while(a>c)
+		a = 10;
+	a_1 = 20;
 	while(a > b)
 		while(a <= b)
 			while(a >= b)

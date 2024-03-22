@@ -1,10 +1,15 @@
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-        int yylex(void);
-        int yyerror(const char *msg);
-        extern int yylineno;
-        extern char *yytext;
+    #include<stdio.h>
+    #include<string.h>
+    #include<stdlib.h>
+    #include<ctype.h>
+    
+    extern int yylineno;
+    extern char *yytext;
+    int yyerrstatus =0;
+    void yyerror(const char *s);
+    int yylex();
+    int yywrap();
 %}
 
 
@@ -14,6 +19,7 @@
 %%
 
 Start : Prog  {printf("valid everything\n");}
+
 
 Prog : HEADER Prog
     |Main_func Prog
@@ -39,11 +45,17 @@ next : multi_arr ',' Multi_func_declr
         |Declr ';' stmt   {printf("valid declaration\n");}
         |if_loop stmt     {printf("valid if else \n");}
         |while_loop stmt  {printf("valid while loopt\n");}
-        // |for_loop     {printf(" valid for loop\n");}
+        |for_loop     {printf(" valid for loop\n");}
         |do_while_loop stmt  {printf("valid do while loop\n");}
+        |switch_case stmt   {printf("valid switch case\n");}
         |
         ;
 
+    one_line : Assgn ';'
+             | Declr ';'
+             | if_loop
+             | while_loop
+             | for_loop
 
 Declr : Type ListVar
       ;
@@ -71,7 +83,7 @@ inisde_arr : NUM
         |
         ;
 
-Assgn : Assign | Array_assign
+Assgn : Assign | Array_assign 
       ;
         
 Assign : ID '=' Expression
@@ -87,6 +99,7 @@ Multi_expr : Expression ',' Multi_expr | Expression
 Expression : Expression '+' T 
         | Expression '-' T 
         | Expression SHN T 
+        | ID INC_DEC
         | T
         ;
 
@@ -95,26 +108,27 @@ T : T '*' R
   | R 
   ;
 
-R : R RELOP F 
-   | R LOGOP F 
+R: R RELOP F 
+   | R LOGOP F
    | F
+   ;
 
 F : '('Expression')' 
   | ID 
   | NUM
   | CHARACTER
   ;
-          
 
-if_loop: IF '(' condition ')' next_part_if
+
+
+if_loop: IF '(' condition ')' if_stmt
        ;
 
-next_part_if : '{'stmt'}' else_part
-        | stmt
+if_stmt : '{'stmt'}' else_part
+        | one_line else_part
         ;
-else_part : ELSE '{'stmt'}'
-          | ELSE if_loop
-          | /* Empty */
+else_part : ELSE loop_stmt
+          | 
           ;
 
 condition: Expression
@@ -122,38 +136,56 @@ condition: Expression
         ;
 
 
-while_loop : WHILE '('Expression ')' next_while_part 
+while_loop : WHILE '('Expression')' loop_stmt 
         ;
 
-next_while_part : '{'stmt'}'
-        | stmt
+loop_stmt : '{'stmt'}'
+        | one_line
         ;
-// loop_stmt :  '{'stmt'}'
-// //            | Assign ';'
-//            |
-           ;
+
 
 do_while_loop : DO '{'stmt'}' WHILE '('condition')'
         ;
 
-// for_declr : Type for_assign
-//         ;
+for_loop : FOR '('stmt';'Expression';'stmt')' loop_stmt
 
-// for_assign : ID ',' for_assign | ID
-//         ;
+switch_case : SWITCH '('Expression')' '{'cases'}'
+            ;
 
-// for_loop : FOR '('for_declr';'Expression';'incr ')' loop_stmt
+cases :  CASE Expression ':' next_case BREAK ';' cases
+      |  DEFAULT ':' next_case BREAK ';'
+      |
+      ;
+
+next_case : '{'stmt'}'
+        | one_line
+        ;
 
 /* TO IMPlement , 
- 1.Switch case 
-2. Short hand notations 
+1. Short hand notations 
  */
 %%
 // void noyywrap();
 
-int yyerror(const char *msg) {
-    printf("Error:%s, line number:%d, token:%s\n", msg, yylineno, yytext);
-    return 0;
+void yyerror(const char* msg) {
+    static int panic_count = 0; 
+    fprintf(stderr, "Error: %s, line number: %d, token: %s\n", msg, yylineno, yytext);
+//     if(panic_count>5)
+// //     return;
+
+    while (1) {
+        int token = yylex();
+        if (token == ';' || token == '}' || token == ')') {
+            yyerrok; 
+            panic_count++;
+            yyparse(); 
+            break;
+        }
+        else if(token == 0)
+        {
+            return;
+        }
+    }
 }
 int main(){
 

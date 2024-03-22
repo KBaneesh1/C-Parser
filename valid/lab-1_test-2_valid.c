@@ -33,9 +33,7 @@ int main()
 	while(a < b)
 		a = 10;
 	while(a <= b)
-	{
 		while(a <= b)
-		{
 			while(a >= b)
 			{
 				int a_3;
@@ -43,6 +41,5 @@ int main()
 				int a_4;
 				a_4 = 6423 + 3661 * 1998;
 			}
-		}
+			
 	}
-}
