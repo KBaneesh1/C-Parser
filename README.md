@@ -14,7 +14,8 @@ Before compiling and running the parser, ensure that you have the following inst
 ## Compilation Steps
 ```bash
 make all
-
+```
+## Execution 
 ```bash
 parser.exe < file_path
 
