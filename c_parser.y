@@ -41,13 +41,13 @@ next : multi_arr ',' Multi_func_declr
 // seq_stmts: stmt seq_stmts
 //         |stmt
         // ;
-    stmt: Assgn ';' stmt  {printf("valid assignment\n");}
-        |Declr ';' stmt   {printf("valid declaration\n");}
-        |if_loop stmt     {printf("valid if else \n");}
-        |while_loop stmt  {printf("valid while loopt\n");}
-        |for_loop     {printf(" valid for loop\n");}
+    stmt: Assgn ';' stmt     {printf("valid assignment\n");}
+        |Declr ';' stmt      {printf("valid declaration\n");}
+        |if_loop stmt        {printf("valid if else \n");}
+        |while_loop stmt     {printf("valid while loopt\n");}
+        |for_loop            {printf(" valid for loop\n");}
         |do_while_loop stmt  {printf("valid do while loop\n");}
-        |switch_case stmt   {printf("valid switch case\n");}
+        |switch_case stmt    {printf("valid switch case\n");}
         |
         ;
 
@@ -66,7 +66,7 @@ ListVar :  common_case ',' ListVar | common_case
 Type : INT | FLOAT | DOUBLE | CHAR
      ;
 
-common_case : Assgn | Arr_declr | Array_init | ID
+common_case : Assign | Arr_declr | Array_init | ID
         ;
 
 Arr_declr : ID multi_arr 
@@ -83,9 +83,11 @@ inisde_arr : NUM
         |
         ;
 
-Assgn : Assign | Array_assign 
+Assgn : Assign | Array_assign |  Short_hand_nt
       ;
         
+Short_hand_nt : ID SHN Expression | ID multi_arr SHN Expression
+
 Assign : ID '=' Expression
         ;
 
@@ -98,8 +100,6 @@ Multi_expr : Expression ',' Multi_expr | Expression
 
 Expression : Expression '+' T 
         | Expression '-' T 
-        | Expression SHN T 
-        | ID INC_DEC
         | T
         ;
 
@@ -115,6 +115,8 @@ R: R RELOP F
 
 F : '('Expression')' 
   | ID 
+  | ID INC_DEC
+  | INC_DEC ID
   | NUM
   | CHARACTER
   ;
@@ -160,6 +162,7 @@ cases :  CASE Expression ':' next_case BREAK ';' cases
 next_case : '{'stmt'}'
         | one_line
         ;
+
 
 /* TO IMPlement , 
 1. Short hand notations 
